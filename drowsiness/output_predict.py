@@ -3,6 +3,7 @@ import torch
 import numpy as np
 from ultralytics import YOLO
 import time
+import collections
 
 class predict:
     def __init__(self):
@@ -12,21 +13,28 @@ class predict:
         self.eye_closed_detect = 0
 
     def run(self, running, frame_time, smemory_fps, smemory_event, smemory_eyeclosed, smemory_eyeopen, smemory_is_drowsy):
-        model = YOLO(r"best (9).pt")
+        model_path = r"best(9).onnx"
         cap = cv2.VideoCapture(0)
         TARGET_WIDTH = 640
         TARGET_HEIGHT = 480
         cap.set(cv2.CAP_PROP_FRAME_WIDTH, TARGET_WIDTH)
         cap.set(cv2.CAP_PROP_FRAME_HEIGHT, TARGET_HEIGHT)
 
+        if torch.cuda.is_available():
+            device = 'cuda'
+        else:
+            device = 'cpu'
+        model = YOLO(model_path, task="detect")
         try:
             while cap.isOpened():
-                ret, frame = cap.read()
+                ret, frame_resized = cap.read()
                 if not ret:
                     break
 
-                frame_resized = cv2.resize(frame, (TARGET_WIDTH, TARGET_HEIGHT))
-                results = model(frame_resized, device='cuda' if torch.cuda.is_available() else 'cpu', stream=True)
+                #frame_resized = cv2.resize(frame, (TARGET_WIDTH, TARGET_HEIGHT), cv2.INTER_LINEAR)
+
+                with torch.no_grad():
+                    results = model(frame_resized)
 
                 #멀티프로세스환경에서누time.time() 이 안먹힘
                 frame_time.value = time.perf_counter()
