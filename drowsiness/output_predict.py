@@ -17,6 +17,7 @@ class predict:
         cap = cv2.VideoCapture(0)
         TARGET_WIDTH = 640
         TARGET_HEIGHT = 480
+        cap.set(cv2.CAP_PROP_FPS, 30)
         cap.set(cv2.CAP_PROP_FRAME_WIDTH, TARGET_WIDTH)
         cap.set(cv2.CAP_PROP_FRAME_HEIGHT, TARGET_HEIGHT)
 
@@ -24,14 +25,12 @@ class predict:
             device = 'cuda'
         else:
             device = 'cpu'
-        model = YOLO(model_path, task="detect")
+        model = YOLO(model_path, task="detect").to(device)
         try:
             while cap.isOpened():
                 ret, frame_resized = cap.read()
                 if not ret:
                     break
-
-                #frame_resized = cv2.resize(frame, (TARGET_WIDTH, TARGET_HEIGHT), cv2.INTER_LINEAR)
 
                 with torch.no_grad():
                     results = model(frame_resized)

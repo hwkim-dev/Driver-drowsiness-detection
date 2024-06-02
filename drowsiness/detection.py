@@ -42,15 +42,7 @@ class detect_process:
     #0.5초 단위로 queue에 쌓인 eye 상태를 전부 저장 시켜놈, 4.5초만큼 쌓이면
 
 
-    # def eye_state_pop(self, smemory_event, eye_state, eye_state_timeline):
-    #     smemory_event.wait()
-    #     smemory_event.clear()
-    #     time.sleep(4.5)
-    #     while True:
-    #         smemory_event.wait()
-    #         test = eye_state_timeline.get()
-    #         eye_state.value -= test
-    #         smemory_event.clear()
+
 
     # 프로그램이 시작하고 4.5초가 지나면 계속 eye_state의 변수를 매 프레임마다 삭제
     # 변경하기 -> 매 프레임 마다 삭제하지 말고 2초분량의 데이터를 2초마다 삭제하기.
@@ -74,32 +66,22 @@ class detect_process:
             smemory_event.clear()
 
         begin_time = time.perf_counter()
+        
+        #0.5초에 while_count가 1증가
+        while_count = 0
         while True:
-            current_timer = time.perf_counter()
-            smemory_event.wait()
-            # cv의 while문이 한번 실행될 떄마다
-            point_f_clock = current_timer - begin_time
-            two_sec_clock += point_f_clock
+            while_count += 1
+            
+            #0.5초마다 한번 실행
+            self.is_Not_Drowsy(smemory_eyeopen, fps_per_p_five_sec, smemory_is_drowsy)
 
-            #0.5초에 한번 실행(눈 뜨고있는지)
-            # 0.5초동안의 fps 개수로 눈 상태를 나눠서
-            # 눈을 뜨고있는 상태라면 음수가 나올거다... 값은 -1~0사이값
-            # 만약 눈을 뜨고있는 상태의 비율이 0.2 이상이면 바로 졸음 아니다 판단.
-            if(point_f_clock) > 0.5:
-                begin_time = time.perf_counter()
-                self.is_Not_Drowsy(smemory_eyeopen, fps_per_p_five_sec, smemory_is_drowsy)
-
-
-            # 2초에 1번 실행(눈 감고있는지)
-            # eye_state.value는 최초 시작 4.5초동안 데이터가 쌓이고
-            # 4.5초가 지나면 맨 처음 들어온 데이터부터 삭제됨.
-            if (two_sec_clock) > 2:
-                two_sec_clock = 0
+            #2초에 한번 실행
+            if(while_count == 4):
+                while_count = 0
                 self.is_Drowsy(eye_state, fps_per_four_p_five_sec, smemory_is_drowsy)
                 eye_state.value -= eye_state_timeline.value
                 eye_state_timeline.value = 0
-
-            smemory_event.clear()
+            time.sleep(0.5)
 
     def is_Not_Drowsy(self, smemory_eyeopen, fps_per_p_five_sec, smemory_is_drowsy):
         if fps_per_p_five_sec.value != 0:
