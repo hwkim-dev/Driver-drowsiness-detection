@@ -1,11 +1,9 @@
 import multiprocessing
-import threading
 import tkinter as tk
 from tkinter import ttk
 import time
 import sys
 from typing import Type
-
 import winsound
 
 import detection
@@ -25,10 +23,8 @@ class ProcessManager:
             'eye_closed_time': multiprocessing.Value('f', 0.0),
             'is_drowsy': multiprocessing.Value('i', 0),
             'eye_state': multiprocessing.Value('f', 0.0),
-            'frame_time': multiprocessing.Value('f', 0.0),
-            'fps_per_4_5_sec': multiprocessing.Value('i', 0),
+            'frame_cnt': multiprocessing.Value('i', 0),
             'eye_open_time': multiprocessing.Value('f', 0.0),
-            'fps_per_1_5_sec': multiprocessing.Value('i', 0),
             'eye_state_timeline': multiprocessing.Value('f', 0),
         }
 
@@ -54,29 +50,25 @@ class ProcessManager:
                         self.shared_memory['event'],
                         self.shared_memory['is_drowsy'],
                         self.shared_memory['eye_state'],
-                        self.shared_memory['fps_per_4_5_sec'],
-                        self.shared_memory['fps_per_1_5_sec'],
+                        self.shared_memory['frame_cnt'],
                         self.shared_memory['eye_state_timeline'],
                     ),
                 )
                 self.processes['detect'] = multiprocessing.Process(
                     target=self.detect_process.recur_time_calculator,
                     args=(
-                        self.shared_memory['frame_time'],
                         self.shared_memory['fps'],
                         self.shared_memory['event'],
                         self.shared_memory['eye_closed_time'],
                         self.shared_memory['eye_state'],
-                        self.shared_memory['fps_per_4_5_sec'],
                         self.shared_memory['eye_state_timeline'],
-                        self.shared_memory['fps_per_1_5_sec'],
+                        self.shared_memory['frame_cnt'],
                     ),
                 )
                 self.processes['predict'] = multiprocessing.Process(
                     target=self.predict_process.run,
                     args=(
                         self.shared_memory['running'],
-                        self.shared_memory['frame_time'],
                         self.shared_memory['fps'],
                         self.shared_memory['event'],
                         self.shared_memory['eye_closed_time'],

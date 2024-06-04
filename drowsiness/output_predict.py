@@ -4,6 +4,7 @@ import numpy as np
 from ultralytics import YOLO
 import time
 import collections
+import constant
 
 class predict:
     def __init__(self):
@@ -12,12 +13,13 @@ class predict:
         self.prev_frame_time = 0
         self.eye_closed_detect = 0
 
-    def run(self, running, frame_time, smemory_fps, smemory_event, smemory_eyeclosed, smemory_eyeopen, smemory_is_drowsy):
-        model_path = r"best(9).onnx"
+    def run(self, running, smemory_fps, new_frame_event, smemory_eyeclosed, smemory_eyeopen, smemory_is_drowsy):
+        model_path = r"models/cpu_model/best(9).onnx"
+        cv2.ocl.setUseOpenCL(True)
         cap = cv2.VideoCapture(0)
         TARGET_WIDTH = 640
         TARGET_HEIGHT = 480
-        cap.set(cv2.CAP_PROP_FPS, 30)
+        # cap.set(cv2.CAP_PROP_FPS, 30)
         cap.set(cv2.CAP_PROP_FRAME_WIDTH, TARGET_WIDTH)
         cap.set(cv2.CAP_PROP_FRAME_HEIGHT, TARGET_HEIGHT)
 
@@ -25,7 +27,7 @@ class predict:
             device = 'cuda'
         else:
             device = 'cpu'
-        model = YOLO(model_path, task="detect").to(device)
+        model = YOLO(model_path, task="detect")
         try:
             while cap.isOpened():
                 ret, frame_resized = cap.read()
@@ -36,8 +38,8 @@ class predict:
                     results = model(frame_resized)
 
                 #멀티프로세스환경에서누time.time() 이 안먹힘
-                frame_time.value = time.perf_counter()
-                smemory_event.set()
+                # frame_time.value = time.perf_counter()
+                new_frame_event.set()
 
                 for result in results:
                     for box in result.boxes:
@@ -65,15 +67,16 @@ class predict:
                 smemory_eyeclosed.value = self.eye_closed_detect
                 self.eye_closed_detect = 0
 
-                if smemory_is_drowsy.value == 1:
+                if smemory_is_drowsy.value == constant.TRUE:
                     cv2.putText(frame_resized, 'Drowsiness Detected!', (50, 50), cv2.FONT_HERSHEY_SIMPLEX,
                                 1.5, (0, 0, 255), 3)
                 cv2.putText(frame_resized, f'FPS: {int(smemory_fps.value)}', (10, 30), cv2.FONT_HERSHEY_SIMPLEX, 1,
                             (0, 255, 255), 2)
 
                 cv2.imshow('Drowsiness Detection', frame_resized)
-                if cv2.waitKey(1) & 0xFF == ord('q'):
-                    break
+
+                cv2.waitKey(1)
+
                 if running.value == 0:
                     break
         except KeyboardInterrupt:

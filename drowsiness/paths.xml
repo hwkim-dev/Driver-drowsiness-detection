@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="EUC-KR" ?>
+<paths>
+    <sound_Path>audio/minitary_warn.wav</sound_Path>
+    <model_path>
+        <cpu_model_Path>models/cpu_model/best(9).onnx</cpu_model_Path>
+        <cuda_model_Path>models/cuda_model/best(9).pt</cuda_model_Path>
+    </model_path>
+</paths>
