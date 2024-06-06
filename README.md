@@ -17,7 +17,10 @@ Control these processes through a GUI.
 deprecated
 
 
-# 사용 데이터
+# data
 |출처|목적|
 |------|---|
 |Aihub의 운전자 및 탑승자 상태 및 이상행동 모니터링 데이터|drowsy, awake 감지|
+
+# environment
+windows
