@@ -18,9 +18,9 @@ deprecated
 
 
 # data
-|출처|목적|
+|source|purpose|
 |------|---|
-|Aihub의 운전자 및 탑승자 상태 및 이상행동 모니터링 데이터|drowsy, awake 감지|
+|Aihub의 운전자 및 탑승자 상태 및 이상행동 모니터링 데이터|detect drowsy, awake|
 
 # environment
 windows
