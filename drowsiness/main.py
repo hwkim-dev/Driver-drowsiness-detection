@@ -8,19 +8,24 @@ import winsound
 
 import detection
 import output_predict
+import xml.etree.ElementTree as ET
 
 
 class ProcessManager:
 
     def __init__(self):
-        self.detect_process = detection.detect_process()
-        self.predict_process = output_predict.predict()
+        path_tree = ET.parse('paths.xml').getroot()
+        sound_path = path_tree.find('sound_Path').text
+        model_path = path_tree.find('model_path')
+
+        self.detect_process = detection.detect_process(sound_path)
+        self.predict_process = output_predict.predict(model_path)
 
         self.shared_memory = {
             'running': multiprocessing.Value('i', 0),
-            'fps': multiprocessing.Value('f', 0.0),
+            'fps': multiprocessing.Value('i', 0),
             'event': multiprocessing.Event(),
-            'eye_closed_time': multiprocessing.Value('f', 0.0),
+            'eye_closed_cnt': multiprocessing.Value('f', 0.0),
             'is_drowsy': multiprocessing.Value('i', 0),
             'eye_state': multiprocessing.Value('f', 0.0),
             'frame_cnt': multiprocessing.Value('i', 0),
@@ -42,7 +47,6 @@ class ProcessManager:
             try:
                 self.shared_memory['running'].value = 1
 
-
                 self.processes['eye_state_clock'] = multiprocessing.Process(
                     target=self.detect_process.eye_state_clock,
                     args=(
@@ -59,7 +63,7 @@ class ProcessManager:
                     args=(
                         self.shared_memory['fps'],
                         self.shared_memory['event'],
-                        self.shared_memory['eye_closed_time'],
+                        self.shared_memory['eye_closed_cnt'],
                         self.shared_memory['eye_state'],
                         self.shared_memory['eye_state_timeline'],
                         self.shared_memory['frame_cnt'],
@@ -71,7 +75,7 @@ class ProcessManager:
                         self.shared_memory['running'],
                         self.shared_memory['fps'],
                         self.shared_memory['event'],
-                        self.shared_memory['eye_closed_time'],
+                        self.shared_memory['eye_closed_cnt'],
                         self.shared_memory['eye_open_time'],
                         self.shared_memory['is_drowsy'],
                     ),

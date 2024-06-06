@@ -5,10 +5,11 @@ import winsound
 
 
 class Sound():
-    def __init__(self):
+    def __init__(self, sound_path):
         self.begin_time = 0
         self.PLAY_TIME = 36
         self.is_stopped = False
+        self.sound_path = sound_path
 
     def is_playing(self):
         if(self.is_stopped == True):
@@ -21,7 +22,7 @@ class Sound():
     def warn(self):
         self.is_stopped = False
         self.begin_time = time.perf_counter()
-        winsound.PlaySound(r'audio/militray_warn.wav', winsound.SND_ASYNC)
+        winsound.PlaySound(self.sound_path, winsound.SND_ASYNC)
 
     def warn_stop(self):
         self.is_stopped = True
