@@ -1,11 +1,8 @@
-import threading
 import sound_play
 import time
-import sched
-import sys
 import numpy as np
 import constant
-
+import cv2
 class detect_process:
 
     def __init__(self, sound_path):
@@ -130,3 +127,48 @@ class detect_process:
     def awake(self):
         if self.sound.is_playing():
             self.sound.warn_stop()
+
+    def image_show(self, smemory_results, show_event, smemory_eyeclosed, smemory_eyeopen, cropped_frame_np, smemory_is_drowsy, smemory_fps):
+        class_names = {0: 'Face', 1: 'Eye open', 2: 'Eye closed', 3: 'Eye open', 4: 'Eye closed', 5: 'Mouth'}
+        eye_closed_detect = 0
+        show_event.wait()
+        show_event.clear()
+
+        while True:
+            show_event.wait()
+            np_crop = np.frombuffer(cropped_frame_np.buf, dtype=np.uint8).reshape(constant.input_shape)
+            result_copy = np.ndarray(buffer=smemory_results.buf, dtype=np.float16, shape=constant.result_shape)
+            for box in result_copy:
+                x1, y1, x2, y2 = box[:4]
+                x1, y1, x2, y2 = int(x1), int(y1), int(x2), int(y2)
+                conf = box[4]
+                cls = int(box[5])
+
+                if conf < 0.3:
+                    continue
+
+                label = class_names.get(cls, 'Unknown')
+                color = (255, 255, 255)
+
+                if label == 'Eye closed':
+                    eye_closed_detect += 0.5
+                    color = (0, 0, 255)
+                elif label == 'Eye open':
+                    smemory_eyeopen.value -= 0.5
+                    color = (0, 255, 0)
+
+                cv2.rectangle(np_crop, (x1, y1), (x2, y2), color, 2)
+                cv2.putText(np_crop, f'{label}', (x1, y1 - 10), cv2.FONT_HERSHEY_SIMPLEX, 0.9,
+                            color, 2)
+
+            smemory_eyeclosed.value = eye_closed_detect
+            eye_closed_detect = 0
+
+            if smemory_is_drowsy.value == constant.TRUE:
+                cv2.putText(np_crop, 'Drowsiness Detected!', (50, 50), cv2.FONT_HERSHEY_SIMPLEX,
+                            1.5, (0, 0, 255), 3)
+            cv2.putText(np_crop, f'FPS: {smemory_fps.value}', (10, 30), cv2.FONT_HERSHEY_SIMPLEX, 1,
+                        (0, 255, 255), 2)
+            cv2.imshow('Drowsiness Detection', np_crop)
+            cv2.waitKey(1)
+            show_event.clear()
