@@ -2,8 +2,6 @@ import time
 import winsound
 
 
-
-
 class Sound():
     def __init__(self, sound_path):
         self.begin_time = 0
@@ -12,7 +10,7 @@ class Sound():
         self.sound_path = sound_path
 
     def is_playing(self):
-        if(self.is_stopped == True):
+        if self.is_stopped == True:
             return False
         if (time.perf_counter() - self.begin_time) < self.PLAY_TIME:
             return True

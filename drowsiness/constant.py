@@ -18,3 +18,5 @@ TARGET_HEIGHT = 720
 #crop setting
 crop_width = 320
 crop_height = 320
+
+DET_MODEL_PATH = r"models/openVINO_model/v8m_drowsy_detect_model_openvino_model/v8m_drowsy_detect_model.xml"

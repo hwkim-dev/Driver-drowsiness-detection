@@ -8,9 +8,11 @@ from typing import Type
 import winsound
 import constant
 import detection
+import gui_manager
 import output_predict
 import xml.etree.ElementTree as ET
 import numpy as np
+
 
 class ProcessManager:
 
@@ -32,9 +34,11 @@ class ProcessManager:
             'frame_cnt': multiprocessing.Value('i', 0),
             'eye_open_cnt': multiprocessing.Value('f', 0.0),
             'eye_state_timeline': multiprocessing.Value('f', 0),
-            'cropped_frame_np': multiprocessing.shared_memory.SharedMemory(create=True, size=int(np.prod(constant.input_shape))),
+            'cropped_frame_np': multiprocessing.shared_memory.SharedMemory(create=True,
+                                                                           size=int(np.prod(constant.input_shape))),
             'show_event': multiprocessing.Event(),
-            'smemory_results': multiprocessing.shared_memory.SharedMemory(create=True, size=int(np.prod(constant.result_shape) * np.dtype(np.float16).itemsize)),
+            'smemory_results': multiprocessing.shared_memory.SharedMemory(create=True, size=int(
+                np.prod(constant.result_shape) * np.dtype(np.float16).itemsize)),
             'rectangle_size': multiprocessing.Array('i', [0, 0, 0, 0]),
         }
 
@@ -120,75 +124,15 @@ class ProcessManager:
                     if process.is_alive():
                         process.terminate()
 
-            # OpenCV 종료 기다리기
             time.sleep(1)
 
-            # 좀비 프로세스가 만약에 있다면 (혹시) 처리
-            for process in self.processes.values():
-                if process is not None:
-                    process.join()
         elif self.shared_memory['running'].value == constant.NOT_RUNNING:
-            return
+            pass
 
-    def quit(self):
-        self.stop_processes()
-        root.destroy()
         sys.exit(0)
 
 
 if __name__ == '__main__':
     manager = ProcessManager()
-
-    root = tk.Tk()
-    root.geometry("400x250")
-    root.title("drowsy-detection-program")
-
-    text_frame = ttk.Frame(root, width=50, height=200)
-    text_frame.pack(expand=True, fill=tk.BOTH, side=tk.LEFT)
-
-    validation_frame = ttk.Frame(root, width=30, height=200)
-    validation_frame.pack(expand=True, fill=tk.BOTH, side=tk.LEFT)
-
-    button_frame = ttk.Frame(root, width=50, height=200)
-    button_frame.pack(expand=True, fill=tk.BOTH, side=tk.LEFT)
-    mg = tk.StringVar()
-    mg.set("CUDA")
-    mg1 = tk.StringVar()
-    mg1.set("OPENVINO")
-    mg2 = tk.StringVar()
-    mg2.set("ONNX")
-    mg3 = tk.StringVar()
-    mg3.set("ss")
-
-    gui_texts = [mg, mg1, mg2, mg3]
-
-    for i in range(4):
-        text = gui_texts[i]
-        entry = ttk.Entry(text_frame, state="readonly", textvariable=text, width=1)
-        entry.pack(expand=True, fill=tk.X, padx=3, pady=10, side=tk.TOP, ipadx=1)
-
-    test1 = tk.StringVar()
-    test1.set("TRUE")
-    test2 = tk.StringVar()
-    test2.set("FALSE")
-    test3 = tk.StringVar()
-    test3.set("TRUE")
-    test4 = tk.StringVar()
-    test4.set("FALSE")
-    gui_texts1 = [test1, test2, test3, test4]
-
-    for i in range(4):
-        text = gui_texts1[i]
-        entry = ttk.Entry(validation_frame, state="readonly", textvariable=text, width=1)
-        entry.pack(expand=True, fill=tk.X, padx=1, pady=10, side=tk.TOP, ipadx=1)
-
-    start_button = ttk.Button(button_frame, text="run", command=manager.start_processes)
-    start_button.pack(expand=True, fill=tk.BOTH, padx=10, pady=10, side=tk.TOP)
-
-    stop_button = ttk.Button(button_frame, text="exit", command=manager.quit)
-    stop_button.pack(expand=True, fill=tk.BOTH, padx=10, pady=10,  side=tk.TOP)
-
-
-    root.protocol("WM_DELETE_WINDOW", manager.quit)
-    root.mainloop()
+    gui_manager.start_window(manager)
 
