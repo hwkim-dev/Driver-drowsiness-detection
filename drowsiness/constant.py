@@ -12,11 +12,14 @@ input_shape = (320, 320, 3)
 result_shape = (4,6)
 
 #camera setting
-TARGET_WIDTH = 1280
-TARGET_HEIGHT = 720
+TARGET_WIDTH = 640
+TARGET_HEIGHT = 640
 
 #crop setting
-crop_width = 320
-crop_height = 320
+#320 x 320
+CROP_SIZE_HALF = 160
+MINIMUM_CROP_SIZE = 102400
+CROP_WIDTH = 320
+CROP_HEIGHT = 320
 
 DET_MODEL_PATH = r"models/openVINO_model/v8m_drowsy_detect_model_openvino_model/v8m_drowsy_detect_model.xml"

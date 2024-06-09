@@ -1,7 +1,5 @@
 import multiprocessing
 from multiprocessing import shared_memory
-import tkinter as tk
-from tkinter import ttk
 import time
 import sys
 from typing import Type
@@ -34,12 +32,13 @@ class ProcessManager:
             'frame_cnt': multiprocessing.Value('i', 0),
             'eye_open_cnt': multiprocessing.Value('f', 0.0),
             'eye_state_timeline': multiprocessing.Value('f', 0),
-            'cropped_frame_np': multiprocessing.shared_memory.SharedMemory(create=True,
-                                                                           size=int(np.prod(constant.input_shape))),
+            'cropped_frame_np': multiprocessing.shared_memory.SharedMemory(
+                create=True, size=int(np.prod(constant.input_shape))),
             'show_event': multiprocessing.Event(),
-            'smemory_results': multiprocessing.shared_memory.SharedMemory(create=True, size=int(
-                np.prod(constant.result_shape) * np.dtype(np.float16).itemsize)),
-            'rectangle_size': multiprocessing.Array('i', [0, 0, 0, 0]),
+            'smemory_results': multiprocessing.shared_memory.SharedMemory(
+                create=True, size=int(
+                    np.prod(constant.result_shape) * np.dtype(np.float16).itemsize
+                )),
         }
 
         self.processes = {
