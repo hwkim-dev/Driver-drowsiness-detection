@@ -39,6 +39,7 @@ class ProcessManager:
                 create=True, size=int(
                     np.prod(constant.result_shape) * np.dtype(np.float16).itemsize
                 )),
+            'smemory_face_detected': multiprocessing.Value('i', 0),
         }
 
         self.processes = {
@@ -79,6 +80,7 @@ class ProcessManager:
                         self.shared_memory['eye_state'],
                         self.shared_memory['frame_cnt'],
                         self.shared_memory['eye_state_timeline'],
+                        self.shared_memory['smemory_face_detected'],
                     ),
                 )
                 self.processes['detect'] = multiprocessing.Process(
@@ -90,6 +92,7 @@ class ProcessManager:
                         self.shared_memory['eye_state'],
                         self.shared_memory['eye_state_timeline'],
                         self.shared_memory['frame_cnt'],
+                        self.shared_memory['smemory_face_detected']
                     ),
                 )
                 self.processes['predict'] = multiprocessing.Process(
@@ -100,6 +103,7 @@ class ProcessManager:
                         self.shared_memory['event'],
                         self.shared_memory['cropped_frame_np'],
                         self.shared_memory['smemory_results'],
+                        self.shared_memory['smemory_face_detected'],
                     ),
                 )
 

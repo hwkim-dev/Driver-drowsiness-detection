@@ -11,15 +11,21 @@ class detect_process:
         self.sound = sound_play.Sound(sound_path)
 
     def recur_time_calculator(self, smemory_fps, new_frame_event, eye_closed_cnt, eye_state, eye_state_timeline,
-                              frame_cnt):
+                              frame_cnt, smemory_face_detected):
         prev_frame_time = 0
         new_frame_time = 0
         copy_eye_state = 0
+        past_time = time.perf_counter()
         while True:
             new_frame_event.wait()
             new_frame_time = time.perf_counter()
             smemory_fps.value = int(1 / (new_frame_time - prev_frame_time))
             prev_frame_time = new_frame_time
+
+            if smemory_face_detected.value == constant.TRUE:
+                if (time.perf_counter() - past_time) > 2:
+                    past_time = time.perf_counter()
+                    smemory_face_detected.value = constant.FALSE
 
             frame_cnt.value += 1
 
@@ -41,7 +47,7 @@ class detect_process:
     #0.5초에 한번 실행해서 눈 뜨고있는지 -> 눈을 뜨고있는데 현재 졸음상태로 판단하면 즉각적으로 졸음 아니라고 해놓기
     #2초에 한번씩 실행해서 눈 감고 있는지 -> 눈 감고있으면 바로 졸음상태로...
     def eye_state_clock(self, smemory_eyeopen, new_frame_event, smemory_is_drowsy, eye_state, frame_cnt,
-                        eye_state_timeline):
+                        eye_state_timeline, smemory_face_detected):
         two_sec_clock = time.perf_counter()
         frame_cnt_0_5 = constant.INIT_VAL
         frame_cnt_2_0 = constant.INIT_VAL
@@ -62,12 +68,13 @@ class detect_process:
             frame_cnt.value = constant.INIT_VAL
             frame_cnt_2_0 += frame_cnt_0_5
             # 0.5초마다 한번 실행
-            self.is_Not_Drowsy(smemory_eyeopen, frame_cnt_0_5, smemory_is_drowsy)
+            if smemory_face_detected.value == constant.TRUE:
+                self.is_Not_Drowsy(smemory_eyeopen, frame_cnt_0_5, smemory_is_drowsy)
 
-            # 2초에 한번 실행
             if while_count == 4:
                 while_count = constant.INIT_VAL
-                self.is_Drowsy(eye_state, frame_cnt_2_0, smemory_is_drowsy)
+                if smemory_face_detected.value == constant.TRUE:
+                    self.is_Drowsy(eye_state, frame_cnt_2_0, smemory_is_drowsy)
                 eye_state.value -= eye_state_timeline.value
                 eye_state_timeline.value = constant.INIT_VAL
                 frame_cnt_2_0 = constant.INIT_VAL
@@ -76,7 +83,6 @@ class detect_process:
     def is_Not_Drowsy(self, smemory_eyeopen, frame_cnt_0_5, smemory_is_drowsy):
         if frame_cnt_0_5 != 0:
             if (smemory_eyeopen.value / frame_cnt_0_5) < constant.EYE_OPEN_RATE_FPS:
-                # 눈 뜨고있다면?
                 smemory_is_drowsy.value = constant.FALSE
                 self.awake()
             smemory_eyeopen.value = constant.INIT_VAL
@@ -84,7 +90,6 @@ class detect_process:
     def is_Drowsy(self, eye_state, frame_cnt_2_0, smemory_is_drowsy):
         if frame_cnt_2_0 != 0:
             if (eye_state.value / frame_cnt_2_0) > constant.EYE_CLOSED_RATE_FPS:
-                # 졸음이면
                 smemory_is_drowsy.value = constant.TRUE
                 self.drowsy()
 
@@ -105,8 +110,8 @@ class detect_process:
 
         while True:
             show_event.wait()
-            np_crop = np.frombuffer(cropped_frame_np.buf, dtype=np.uint8).reshape(constant.input_shape)
-            result_copy = np.ndarray(buffer=smemory_results.buf, dtype=np.float16, shape=constant.result_shape)
+            np_crop = np.frombuffer(cropped_frame_np.buf, dtype=np.uint8).reshape(constant.input_shape).copy()
+            result_copy = np.ndarray(buffer=smemory_results.buf, dtype=np.float16, shape=constant.result_shape).copy()
             for box in result_copy:
                 x1, y1, x2, y2 = box[:4]
                 x1, y1, x2, y2 = int(x1), int(y1), int(x2), int(y2)
@@ -134,8 +139,8 @@ class detect_process:
             eye_closed_detect = 0
 
             if smemory_is_drowsy.value == constant.TRUE:
-                cv2.putText(np_crop, 'Drowsiness Detected!', (50, 50), cv2.FONT_HERSHEY_SIMPLEX,
-                            1.5, (0, 0, 255), 3)
+                cv2.putText(np_crop, 'Drowsiness!', (50, 50), cv2.FONT_HERSHEY_SIMPLEX,
+                            1.1, (0, 0, 255), 3)
             cv2.putText(np_crop, f'FPS: {smemory_fps.value}', (10, 30), cv2.FONT_HERSHEY_SIMPLEX, 1,
                         (0, 255, 255), 2)
             cv2.imshow('Drowsiness Detection', np_crop)

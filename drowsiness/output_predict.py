@@ -26,10 +26,12 @@ class predict:
 
         self.model = YOLO(self.model_path, task="detect")
 
-    def run(self, running, show_event, new_frame_event, cropped_frame_np, smemory_results):
+    def run(self, running, show_event, new_frame_event, cropped_frame_np, smemory_results, smemory_face_detected):
         det_model = None
         if self.face_device == 'cuda':
-            det_model = YOLO(self.xml_path.find('drowsy_detect_model_Path').find('cuda_model_Path').text, task="detect")
+            det_model = YOLO(
+                self.xml_path.find('drowsy_detect_model_Path').find('cuda_model_Path').text,
+                task="detect")
         elif self.face_device == 'cpu':
             det_model = YOLO(self.xml_path.find('default_model_Path').text)
             det_model()
@@ -44,16 +46,8 @@ class predict:
                 disabled=False,
             )
 
-            source = 0
-
             det_ov_model = core.read_model(det_model_path)
             ov_config = {}
-
-            # openvino에서 고성능모드 활성화
-            # Latency = 1
-            # Throughput = 2
-            #ov.properties.hint.PerformanceMode(ov.properties.hint.PerformanceMode.LATENCY,)
-
 
             if device.value != "CPU":
                 det_ov_model.reshape({0: [1, 3, constant.CROP_HEIGHT, constant.CROP_WIDTH]})
@@ -80,20 +74,18 @@ class predict:
 
         x_min, y_min, x_max, y_max = 0, 0, 0, 0
 
-        past_time = time.perf_counter()
-        face_detected = False
         while cap.isOpened():
             ret, frame_resized = cap.read()
             if not ret:
                 break
 
             new_frame_event.set()
-            if not face_detected:
+            if smemory_face_detected.value == constant.FALSE:
                 face_detect_results = self.model(frame_resized, max_det=1, classes=(0,), device=self.face_device)
                 for face_detect_result in face_detect_results:
                     if len(face_detect_result.boxes.xyxy) != 0 and len(face_detect_result.boxes.cls) != 0:
 
-                        face_detected = True
+                        smemory_face_detected.value = constant.TRUE
                         x1, y1, x2, y2 = face_detect_result.boxes.xyxy[0].int().tolist()
                         center_x = int((x1 + x2) / 2)
                         center_y = int((y1 + y2) / 2)
@@ -104,24 +96,16 @@ class predict:
                         y_max = y_min + constant.CROP_HEIGHT
 
                         if x_max < constant.CROP_WIDTH or y_max < constant.CROP_HEIGHT:
-                            face_detected = False
+                            smemory_face_detected.value = constant.FALSE
                         elif x_max > constant.TARGET_WIDTH or y_max > constant.TARGET_HEIGHT:
-                            face_detected = False
-                        else:
-                            # 감지했을떄
-                            past_time = time.perf_counter()
+                            smemory_face_detected.value = constant.FALSE
 
 
 
-            elif face_detected == True:
-                if (time.perf_counter() - past_time) > 2:
-                    past_time = time.perf_counter()
-                    face_detected = False
-
+            elif smemory_face_detected.value == constant.TRUE:
                 arr = np.frombuffer(cropped_frame_np.buf, dtype=np.uint8).reshape(constant.input_shape)
-                arr[:] = frame_resized[y_min:y_max, x_min:x_max, :]
-                resized_frame_np = cv2.resize(arr, (constant.CROP_WIDTH, constant.CROP_HEIGHT))
-                resized_frame_torch = torch.from_numpy(resized_frame_np).permute(2, 0, 1).unsqueeze(0).float() / 255
+                arr[:] = np.resize(frame_resized[y_min:y_max, x_min:x_max, :], (320, 320, 3))
+                resized_frame_torch = torch.from_numpy(arr).permute(2, 0, 1).unsqueeze(0).float() / 255
                 face_results = det_model(resized_frame_torch, max_det=4)
 
                 for result in face_results:
