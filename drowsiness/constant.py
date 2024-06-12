@@ -21,6 +21,9 @@ result_shape = (4,6)
 TARGET_WIDTH = 640
 TARGET_HEIGHT = 640
 
+#device_name
+CUDA = 'cuda'
+LOCAL = 'cpu'
 #crop setting
 #320 x 320
 CROP_SIZE_HALF = 160

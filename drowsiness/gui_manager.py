@@ -1,51 +1,56 @@
 import tkinter as tk
 from tkinter import ttk
+import constant
 
-def start_window(manager):
-    root = tk.Tk()
-    root.geometry("400x250")
-    root.title("drowsy-detection-program")
+class manager:
+    def __init__(self):
+        pass
 
-    text_frame = ttk.Frame(root, width=50, height=200)
-    text_frame.pack(expand=True, fill=tk.BOTH, side=tk.LEFT)
+    def start_window(self, manager):
+        root = tk.Tk()
+        root.geometry("400x250")
+        root.title("drowsy-detection-program")
 
-    validation_frame = ttk.Frame(root, width=30, height=200)
-    validation_frame.pack(expand=True, fill=tk.BOTH, side=tk.LEFT)
+        text_frame = ttk.Frame(root, width=50, height=200)
+        text_frame.pack(expand=True, fill=tk.BOTH, side=tk.LEFT)
 
-    button_frame = ttk.Frame(root, width=50, height=200)
-    button_frame.pack(expand=True, fill=tk.BOTH, side=tk.LEFT)
-    mg = tk.StringVar()
-    mg.set("CUDA")
-    mg1 = tk.StringVar()
-    mg1.set("OPENVINO")
+        validation_frame = ttk.Frame(root, width=30, height=200)
+        validation_frame.pack(expand=True, fill=tk.BOTH, side=tk.LEFT)
 
-    gui_texts = [mg, mg1]
+        button_frame = ttk.Frame(root, width=50, height=200)
+        button_frame.pack(expand=True, fill=tk.BOTH, side=tk.LEFT)
+        mg = tk.StringVar()
+        mg.set("CUDA")
+        mg1 = tk.StringVar()
+        mg1.set("OPENVINO")
 
-    for i in range(2):
-        text = gui_texts[i]
-        entry = ttk.Entry(text_frame, state="readonly", textvariable=text, width=1)
-        entry.pack(expand=True, fill=tk.X, padx=3, pady=10, side=tk.TOP, ipadx=1)
+        gui_texts = [mg, mg1]
 
-    test1 = tk.StringVar()
-    test2 = tk.StringVar()
-    if manager.predict_process.face_device == 'cuda':
-        test1.set("TRUE")
-        test2.set("FALSE")
-    else:
-        test1.set("FALSE")
-        test2.set("TRUE")
-    gui_texts1 = [test1, test2]
+        for i in range(2):
+            text = gui_texts[i]
+            entry = ttk.Entry(text_frame, state="readonly", textvariable=text, width=1)
+            entry.pack(expand=True, fill=tk.X, padx=3, pady=10, side=tk.TOP, ipadx=1)
 
-    for i in range(2):
-        text = gui_texts1[i]
-        entry = ttk.Entry(validation_frame, state="readonly", textvariable=text, width=1)
-        entry.pack(expand=True, fill=tk.X, padx=1, pady=10, side=tk.TOP, ipadx=1)
+        test1 = tk.StringVar()
+        test2 = tk.StringVar()
+        if manager.device == constant.CUDA:
+            test1.set("TRUE")
+            test2.set("FALSE")
+        else:
+            test1.set("FALSE")
+            test2.set("TRUE")
+        gui_texts1 = [test1, test2]
 
-    start_button = ttk.Button(button_frame, text="run", command=manager.start_processes)
-    start_button.pack(expand=True, fill=tk.BOTH, padx=10, pady=10, side=tk.TOP)
+        for i in range(2):
+            text = gui_texts1[i]
+            entry = ttk.Entry(validation_frame, state="readonly", textvariable=text, width=1)
+            entry.pack(expand=True, fill=tk.X, padx=1, pady=10, side=tk.TOP, ipadx=1)
 
-    stop_button = ttk.Button(button_frame, text="exit", command=manager.stop_processes)
-    stop_button.pack(expand=True, fill=tk.BOTH, padx=10, pady=10, side=tk.TOP)
+        start_button = ttk.Button(button_frame, text="run", command=manager.start_processes)
+        start_button.pack(expand=True, fill=tk.BOTH, padx=10, pady=10, side=tk.TOP)
 
-    root.protocol("WM_DELETE_WINDOW", manager.stop_processes)
-    root.mainloop()
+        stop_button = ttk.Button(button_frame, text="exit", command=manager.stop_processes)
+        stop_button.pack(expand=True, fill=tk.BOTH, padx=10, pady=10, side=tk.TOP)
+
+        root.protocol("WM_DELETE_WINDOW", manager.stop_processes)
+        root.mainloop()

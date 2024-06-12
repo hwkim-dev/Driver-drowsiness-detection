@@ -1,16 +1,15 @@
 # export model -> from pt to onnx & openvino & cuda(engine)
-import torch
 import os
 import xml
 from ultralytics import YOLO
 import constant
 import shutil
 class exporter():
-    def __init__(self, model_path):
+    def __init__(self, model_path, device):
         base_path = os.path.dirname(os.path.abspath(__file__)) + "\\"
         face_pt_path = base_path + model_path.find('default_model_Path').find('face').text.strip()
         drowsy_pt_path = base_path + model_path.find('default_model_Path').find('drowsy').text.strip()
-        if torch.cuda.is_available():
+        if device == 'cuda':
             cuda_face_model_full_path = base_path + model_path.find('face_detect_model_Path').find('cuda_model_Path').text.strip()
             cuda_detection_model_full_path = base_path + model_path.find('drowsy_detect_model_Path').find('cuda_model_Path').text.strip()
 

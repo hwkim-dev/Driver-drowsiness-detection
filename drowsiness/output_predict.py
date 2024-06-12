@@ -8,7 +8,7 @@ import ipywidgets as widgets
 import openvino as ov
 
 class predict:
-    def __init__(self, xml_path):
+    def __init__(self, xml_path, device):
         self.xml_path = xml_path
         self.class_names = {0: 'Face', 1: 'Eye open', 2: 'Eye closed', 3: 'Eye open', 4: 'Eye closed', 5: 'Mouth'}
         self.CONFIDENCE_THRESHOLD = 0.5
@@ -16,23 +16,22 @@ class predict:
         self.eye_closed_detect = 0
         self.model_path = None
 
-        self.face_device = None
-        if torch.cuda.is_available():
-            self.face_device = 'cuda'
+        self.face_device = device
+
+        if self.face_device == constant.CUDA:
             self.model_path = xml_path.find('face_detect_model_Path').find('cuda_model_Path').text
         else:
-            self.face_device = 'cpu'
             self.model_path = xml_path.find('face_detect_model_Path').find('cpu_model_Path').text
 
         self.model = YOLO(self.model_path, task="detect")
 
     def run(self, running, show_event, new_frame_event, cropped_frame_np, smemory_results, smemory_face_detected):
         det_model = None
-        if self.face_device == 'cuda':
+        if self.face_device == constant.CUDA:
             det_model = YOLO(
                 self.xml_path.find('drowsy_detect_model_Path').find('cuda_model_Path').text,
                 task="detect")
-        elif self.face_device == 'cpu':
+        elif self.face_device == constant.LOCAL:
             det_model = YOLO(self.xml_path.find('default_model_Path').find('face').text)
             det_model()
             det_model_path = constant.DET_MODEL_PATH
@@ -76,7 +75,7 @@ class predict:
             ret, frame_resized = cap.read()
             if not ret:
                 break
-
+            print(frame_resized.shape)
             new_frame_event.set()
             if smemory_face_detected.value == constant.FALSE:
                 face_detect_results = self.model(frame_resized, max_det=1, classes=(0,), device=self.face_device)
