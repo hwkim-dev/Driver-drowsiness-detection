@@ -152,9 +152,6 @@ dmypy.json
 # Cython debug symbols
 cython_debug/
 
-# cuda model(exceeds 100MB)
-.engine
-
 # PyCharm
 #  JetBrains specific template is maintained in a separate JetBrains.gitignore that can
 #  be found at https://github.com/github/gitignore/blob/main/Global/JetBrains.gitignore
@@ -164,3 +161,11 @@ cython_debug/
 
 
 
+# v8m_drowsy_detect_model_openvino_model 폴더 제외
+v8m_drowsy_detect_model_openvino_model/
+
+# .engine 확장자 파일 제외
+*.engine
+
+# .onnx 확장자 파일 제외
+*.onnx
