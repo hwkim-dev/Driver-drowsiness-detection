@@ -7,6 +7,12 @@ DROWSINESS_CHECK_INTERVAL = 2
 RUNNING = 0
 NOT_RUNNING = 1
 
+CONF_DROWSY_DETECT = 0.4
+
+#sound play length(second)
+SOUND_PLAY_SEC = 36
+
+
 #for shared_memoru_size
 input_shape = (320, 320, 3)
 result_shape = (4,6)

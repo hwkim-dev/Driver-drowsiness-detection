@@ -10,7 +10,7 @@ class detect_process:
     def __init__(self, sound_path):
         self.sound = sound_play.Sound(sound_path)
 
-    def recur_time_calculator(self, smemory_fps, new_frame_event, eye_closed_cnt, eye_state, eye_state_timeline,
+    def recur_time_calculator(self, fps, new_frame_event, eye_closed_cnt, eye_state, eye_state_timeline,
                               frame_cnt, smemory_face_detected):
         prev_frame_time = 0
         new_frame_time = 0
@@ -19,7 +19,7 @@ class detect_process:
         while True:
             new_frame_event.wait()
             new_frame_time = time.perf_counter()
-            smemory_fps.value = int(1 / (new_frame_time - prev_frame_time))
+            fps.value = int(1 / (new_frame_time - prev_frame_time))
             prev_frame_time = new_frame_time
 
             if smemory_face_detected.value == constant.TRUE:
@@ -60,6 +60,7 @@ class detect_process:
             new_frame_event.clear()
 
         # 0.5초에 while_count가 1증가
+        # 2초면 while_count가 4dla
         while_count = constant.INIT_VAL
         eye_state_timeline.value = constant.INIT_VAL
         while True:

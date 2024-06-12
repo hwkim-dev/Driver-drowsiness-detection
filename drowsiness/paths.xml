@@ -1,28 +1,33 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <paths>
-    <sound_Path>audio/militray_warn.wav</sound_Path>
+    <sound_Path>audio\militray_warn.wav</sound_Path>
     <model_path>
         <face_detect_model_Path>
             <cpu_model_Path>
-                models/cpu_model/v8n_facedetect_model.onnx
+                models\cpu_model\v8n_facedetect_model.onnx
             </cpu_model_Path>
             <cuda_model_Path>
-                models/cuda_model/v8n_facedetect_model.engine
+                models\cuda_model\v8n_facedetect_model.engine
             </cuda_model_Path>
         </face_detect_model_Path>
         <drowsy_detect_model_Path>
             <cpu_model_Path>
-                models/cpu_model/v8n_facedetect_model.onnx
+                models\cpu_model\v8n_facedetect_model.onnx
             </cpu_model_Path>
             <cuda_model_Path>
-                models/cuda_model/v8m_drowsy_detect_model.engine
+                models\cuda_model\v8m_drowsy_detect_model.engine
             </cuda_model_Path>
             <openvino_model_Path>
-                models/openVINO_model/v8m_drowsy_detect_model_openvino_model/v8m_drowsy_detect_model.xml
+                models\openVINO_model\v8m_drowsy_detect_model_openvino_model\v8m_drowsy_detect_model.xml
             </openvino_model_Path>
         </drowsy_detect_model_Path>
         <default_model_Path>
-                models/pt_model/v8n_facedetect_model.pt
+            <face>
+                models\pt_model\v8n_facedetect_model.pt
+            </face>
+            <drowsy>
+                models\pt_model\v8m_drowsy_detect_model.pt
+            </drowsy>
         </default_model_Path>
     </model_path>
 </paths>

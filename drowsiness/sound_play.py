@@ -1,11 +1,11 @@
 import time
 import winsound
-
+import constant
 
 class Sound():
     def __init__(self, sound_path):
         self.begin_time = 0
-        self.PLAY_TIME = 36
+        self.PLAY_TIME = constant.SOUND_PLAY_SEC
         self.is_stopped = False
         self.sound_path = sound_path
 

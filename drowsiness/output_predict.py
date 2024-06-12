@@ -33,7 +33,7 @@ class predict:
                 self.xml_path.find('drowsy_detect_model_Path').find('cuda_model_Path').text,
                 task="detect")
         elif self.face_device == 'cpu':
-            det_model = YOLO(self.xml_path.find('default_model_Path').text)
+            det_model = YOLO(self.xml_path.find('default_model_Path').find('face').text)
             det_model()
             det_model_path = constant.DET_MODEL_PATH
 
@@ -56,7 +56,6 @@ class predict:
                 ov_config = {"GPU_DISABLE_WINOGRAD_CONVOLUTION": "YES", "GPU_HOST_TASK_PRIORITY": "HIGH"}
 
             compiled_model = core.compile_model(det_ov_model, device.value, ov_config)
-
             def infer(*args):
                 rs = compiled_model(args)
                 return torch.from_numpy(rs[0])
@@ -68,7 +67,6 @@ class predict:
         cv2.setUseOptimized(True)
 
         cap = cv2.VideoCapture(0, cv2.CAP_DSHOW)
-        #1280 x 720
         cap.set(cv2.CAP_PROP_FRAME_WIDTH, constant.TARGET_WIDTH)
         cap.set(cv2.CAP_PROP_FRAME_HEIGHT, constant.TARGET_HEIGHT)
 
@@ -109,7 +107,7 @@ class predict:
                 face_results = det_model(resized_frame_torch, max_det=4)
 
                 for result in face_results:
-                    # n(탐지클래스) x 6(박스, conf, 클래스) 배열(텐서)
+                    # n(탐지클래스) x 6(박스/ conf/ 클래스) 배열(텐서)
                     res_np_arr = np.ndarray(buffer=smemory_results.buf, dtype=np.float16, shape=constant.result_shape)
                     result_boxes = result.boxes.data.numpy()
                     res_np_arr[:result_boxes.shape[0], :] = result_boxes
