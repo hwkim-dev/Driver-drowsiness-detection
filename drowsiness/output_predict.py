@@ -2,7 +2,6 @@ import cv2
 import torch
 import numpy as np
 from ultralytics import YOLO
-import time
 import constant
 import ipywidgets as widgets
 import openvino as ov
