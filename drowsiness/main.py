@@ -97,6 +97,9 @@ class ProcessManager:
 
     def stop_processes(self):
         if self.s_memory.get_value('running') == constant.RUNNING:
+            self.s_memory.set_memory('running', constant.NOT_RUNNING)
+            time.sleep(1)
+
             winsound.PlaySound(None, winsound.SND_PURGE)
             for process in self.processes.values():
                 if process is None:
@@ -105,13 +108,18 @@ class ProcessManager:
                     if process.is_alive():
                         process.terminate()
 
-            time.sleep(1)
             self.s_memory.kill_process()
 
         elif self.s_memory.get_value('running') == constant.NOT_RUNNING:
             pass
-
-        sys.exit(0)
+        try:
+            from IPython import get_ipython
+            if get_ipython():
+                time.sleep(1)
+            else:
+                sys.exit(0)
+        except ImportError:
+            sys.exit(0)
 
 
 if __name__ == '__main__':

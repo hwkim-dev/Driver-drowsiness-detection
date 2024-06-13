@@ -2,6 +2,7 @@ import tkinter as tk
 from tkinter import ttk
 import constant
 
+
 class manager:
     def __init__(self):
         pass
@@ -49,8 +50,13 @@ class manager:
         start_button = ttk.Button(button_frame, text="run", command=manager.start_processes)
         start_button.pack(expand=True, fill=tk.BOTH, padx=10, pady=10, side=tk.TOP)
 
-        stop_button = ttk.Button(button_frame, text="exit", command=manager.stop_processes)
+        def exit_button():
+            root.destroy()
+            manager.stop_processes()
+
+        stop_button = ttk.Button(button_frame, text="exit", command=exit_button)
         stop_button.pack(expand=True, fill=tk.BOTH, padx=10, pady=10, side=tk.TOP)
 
         root.protocol("WM_DELETE_WINDOW", manager.stop_processes)
         root.mainloop()
+
