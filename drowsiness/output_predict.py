@@ -74,7 +74,6 @@ class predict:
             ret, frame_resized = cap.read()
             if not ret:
                 break
-            print(frame_resized.shape)
             new_frame_event.set()
             if smemory_face_detected.value == constant.FALSE:
                 face_detect_results = self.model(frame_resized, max_det=1, classes=(0,), device=self.face_device)

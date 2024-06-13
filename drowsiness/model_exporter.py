@@ -33,6 +33,8 @@ class exporter():
                 onnx_face_path_parts = os.path.dirname(onnx_full_path)
                 os.mkdir(onnx_face_path_parts)
                 shutil.move(onnx_f_out_path, onnx_face_path_parts)
+                test_ = YOLO(onnx_full_path)
+                test_()
 
             if not os.path.exists(ov_detection_model_full_path):
                 ov_d_out_path = YOLO(drowsy_pt_path, task="detect").export(format='openvino', dynamic=False, half=True,  imgsz=(constant.CROP_HEIGHT, constant.CROP_WIDTH))
