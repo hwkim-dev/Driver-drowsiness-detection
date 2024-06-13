@@ -69,4 +69,4 @@ google drive link: [🔗](https://docs.google.com/presentation/d/1pbqiPMLQGaspg0
 3. opencv
 4. ipywidgets
 5. pytorch
-6. openvino (in case you don't have cuda)
+6. openvino (in case cuda unavailable)
