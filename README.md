@@ -43,7 +43,7 @@ Control these processes through a GUI.
 # data
 |source|purpose|link|
 |------|---|---|
-|Driver and Passenger State and Anomaly Behavior Monitoring Data from Aihub|detect drowsy, awake|https://www.aihub.or.kr/aihubdata/data/view.do?currMenu=115&topMenu=100&aihubDataSe=data&dataSetSn=173|  
+|Driver and Passenger State and Anomaly Behavior Monitoring Data from Aihub|detect face eye mouth|https://www.aihub.or.kr/aihubdata/data/view.do?currMenu=115&topMenu=100&aihubDataSe=data&dataSetSn=173|  
   
 <br/>
 <br/>
