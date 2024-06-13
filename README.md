@@ -41,8 +41,16 @@ Control these processes through a GUI.
 <br/>
 <br/>
 <br/>  
-# ppt
-will be added soon.  
+
+# ppt  
+
+google drive link: [🔗](https://docs.google.com/presentation/d/1pbqiPMLQGaspg0C_ryWQmM1hd6Aktyi-/edit?usp=sharing&ouid=104335523960644232607&rtpof=true&sd=true)  
+
+<h3>Presentation Format and Compatibility</h3>
+
+* **Microsoft PowerPoint Format:** This presentation was created in Microsoft PowerPoint for optimal viewing.
+* **Potential Animation Issues:** Please be aware that certain animations may not function properly when using other presentation software.
+* **Recommendation:** For the best viewing experience, it is recommended to use Microsoft PowerPoint to open and present this file.
 
 <br/>
 <br/>
