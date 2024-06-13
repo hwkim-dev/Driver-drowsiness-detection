@@ -31,12 +31,19 @@ Control these processes through a GUI.
 
 <br/>
 <br/>
+<br/>  
+
+# optimization & performance  
+![performance](https://github.com/hwkim-dev/Driver-drowsiness-detection/assets/54717101/674875ea-35a4-49a9-98e1-499000b9df55)  
+
+<br/>
+<br/>
 <br/>
   
 # data
 |source|purpose|link|
 |------|---|---|
-|Aihub의 운전자 및 탑승자 상태 및 이상행동 모니터링 데이터|detect drowsy, awake|https://www.aihub.or.kr/aihubdata/data/view.do?currMenu=115&topMenu=100&aihubDataSe=data&dataSetSn=173|  
+|Driver and Passenger State and Anomaly Behavior Monitoring Data from Aihub|detect drowsy, awake|https://www.aihub.or.kr/aihubdata/data/view.do?currMenu=115&topMenu=100&aihubDataSe=data&dataSetSn=173|  
   
 <br/>
 <br/>
